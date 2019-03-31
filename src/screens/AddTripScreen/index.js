@@ -1,10 +1,34 @@
 import React, { Component } from 'react';
-import { View, Text,Image, FlatList,TouchableOpacity} from 'react-native';
+import { View, Text,Image, TextInput,TouchableOpacity, AsyncStorage} from 'react-native';
 import styles from './styles'
 
-class TripScreen extends Component{
+class AddTripScreen extends Component{
     static navigationOptions = {
         header:null
+    }
+
+    state = {
+      trip:'',
+    }
+
+    handleSave = async() => {
+        const trip = {
+            id:new Date.getTime(),
+            trip: this.state.trip,
+            price:0,
+            latitude:0,
+            longitude:0
+        }
+
+        const tripsAS = await AsyncStorage.getItem('trips')
+        let trips = []
+        if(tripsAS){
+            trips = JSON.parse(tripsAS)
+        }
+
+        trips.push(trip)
+        await AsyncStorage.setItem('trips', JSON.stringify(trips))
+        
     }
 
     renderItem = item => {
@@ -38,37 +62,21 @@ class TripScreen extends Component{
         return(
             <View style={styles.wrapper}>
                 <View style={styles.header}>
-                    <View style={styles.backButton}>
-                        <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
-                            <Image source={require('../../../assets/arrow-left.png')}/>
-                        </TouchableOpacity>
-                    </View>
-                    <View style={styles.circleBackground}>
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Addtrip')}>
-                            <Image source={ require('../../../assets/Ellipse.png') }/>
-                            <Image style={styles.btnAdd} source={require('../../../assets/Union.png')}/>
-                        </TouchableOpacity>
-                    </View>
-
-                    <Text style={styles.tripName}>{trip.name}</Text>
-                    <Text style={styles.tripPrice}>R$ {trip.price}</Text>
+                  <View style={styles.backButton}>
+                      <TouchableOpacity onPress={() => this.props.navigation.goBack()}>
+                          <Image source={require('../../../assets/arrow-left.png')}/>
+                      </TouchableOpacity>
+                  </View>
                 </View>
-
-                <FlatList style={{flex:1}}
-                    data={trip.places}
-                    renderItem={this.renderItem}
-                    keyExtractor={ item => item.id}
-                    contentContainerStyle={{
-                        paddingTop:16,
-                        paddingLeft:16,
-
-                    }}
-        
-                />
                 
-            </View>
+                <TextInput style={styles.input} placeholder="Nome do ponto" onChangeText={txt => this.setState({trip:txt})}/>
+                <TouchableOpacity style={styles.btnSave}>
+                  <Text style={styles.textButtonSave}>Salvar viagem</Text>
+                </TouchableOpacity>
+            </View> 
         );
     }
 }
 
-export default TripScreen;
+export default AddTripScreen;
+

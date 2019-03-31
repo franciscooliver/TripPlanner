@@ -65,5 +65,26 @@ export default styles = StyleSheet.create({
         color:'#24c6dc',
         fontWeight:'bold'
     },
+    input:{
+        backgroundColor:"#e5e5e5",
+        marginLeft:16,
+        marginTop:16,
+        marginRight:16,
+        fontSize:16,
+        paddingTop:15,
+        paddingLeft:5,
+        paddingBottom:15,
+        color:"#000"
+    },
+    btnSave:{
+        backgroundColor:"#e5e5e5",
+        marginLeft:16,
+        marginTop:16,
+        marginRight:16,
+        padding:20,
+    },
+    textButtonSave:{
+        textAlign:"center"
+    }
 
 });
