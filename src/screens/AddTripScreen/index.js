@@ -12,8 +12,9 @@ class AddTripScreen extends Component{
     }
 
     handleSave = async() => {
+        let date = new Date();
         const trip = {
-            id:new Date.getTime(),
+            id: date.getTime(),
             trip: this.state.trip,
             price:0,
             latitude:0,
@@ -26,8 +27,12 @@ class AddTripScreen extends Component{
             trips = JSON.parse(tripsAS)
         }
 
+
         trips.push(trip)
         await AsyncStorage.setItem('trips', JSON.stringify(trips))
+        
+
+        this.props.navigation.navigate('AddPointScreen', {id:trip.id })
         
     }
 
@@ -44,21 +49,7 @@ class AddTripScreen extends Component{
     }
 
     render(){
-        const trip = {
-            name: 'Eurotrip 2019',
-            price:'R$ 4.000',
-            places:[
-                { id:'1', name:'Amsterdan', price: 100,description: 'Chegada', lat:0, log:0 },
-                { id:'2', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'3', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'4', name:'Amsterdan', price: 100,description: 'Chegada', lat:0, log:0 },
-                { id:'5', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'6', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'7', name:'Amsterdan', price: 100,description: 'Chegada', lat:0, log:0 },
-                { id:'8', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'9', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-            ]
-        };
+    
         return(
             <View style={styles.wrapper}>
                 <View style={styles.header}>
@@ -70,9 +61,11 @@ class AddTripScreen extends Component{
                 </View>
                 
                 <TextInput style={styles.input} placeholder="Nome do ponto" onChangeText={txt => this.setState({trip:txt})}/>
-                <TouchableOpacity style={styles.btnSave}>
+                <TouchableOpacity style={styles.btnSave} onPress={this.handleSave}>
                   <Text style={styles.textButtonSave}>Salvar viagem</Text>
                 </TouchableOpacity>
+
+                <Text>{this.state.trip}</Text>
             </View> 
         );
     }

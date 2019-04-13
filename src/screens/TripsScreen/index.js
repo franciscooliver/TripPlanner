@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import { View,Image, Text, FlatList,StyleSheet,TouchableHighlight  } from 'react-native';
+import { View,Image, Text,AsyncStorage, FlatList,StyleSheet,TouchableHighlight  } from 'react-native';
 import Trip from './Trip';
 import isIphoneX from '../../utils/IsIphoneX';
 import MapView ,{PROVIDER_GOOGLE} from 'react-native-maps';
@@ -9,6 +9,9 @@ export default class TripsScreen extends Component{
         header:null
     }
 
+    state = {
+        trips:[]
+    }
    
     renderItem = item => {
         {/* component Trip */}
@@ -16,7 +19,22 @@ export default class TripsScreen extends Component{
          
     }
 
-     render(){
+    componentDidMount(){
+        this.loadData()
+    }
+
+    loadData = async() => {
+        const tripsAS = await AsyncStorage.getItem('trips')
+        
+        let trips = []
+        if(tripsAS){
+            trips = JSON.parse(tripsAS)
+        }
+        
+        this.setState({trips:trips})
+    }
+
+     render(){  
         console.log(isIphoneX())
         const trips = [
             {id:'1', name:'Eurotrip 2019', price:'R$ 4.000' },

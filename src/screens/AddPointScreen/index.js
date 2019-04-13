@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, Text,Image, TextInput,TouchableOpacity} from 'react-native';
+import { View, Text,Image, TextInput,TouchableOpacity, AsyncStorage} from 'react-native';
 import styles from './styles'
 import MapView, { Marker,PROVIDER_GOOGLE} from 'react-native-maps';
 
@@ -16,11 +16,49 @@ class AddTripScreen extends Component{
       pointName:'',
       description:'',
       price:0
-    }   
+    } 
+    
+    handleSave = async() => {
+      const id = this.props.navigation.state.params.id
+      const pointsAS = await AsyncStorage.getItem('trip-'+id);
+      let points = [];
+
+      if(pointsAS){
+        points = JSON.parse(pointsAS)
+      }
+
+      points.push(this.state)
+      await AsyncStorage.setItem('trip-'+id, JSON.stringify(points));
+
+      let total = 0;
+      points.forEach(p => {
+        total += p.price
+      });
+
+      const tripsAS  = await AsyncStorage.getItem('trips')
+      let trips = [];
+      if(tripsAS){
+        trips = JSON.parse(tripsAS)
+      }
+
+      trips.forEach((trip, index) => {
+        if(trip.id === id){
+          trips[index] = total
+          trips[index].latitude = points[0].position.latitude
+          trips[index].longitude = points[0].position.longitude
+          
+        }
+      });
+
+      await AsyncStorage.setItem('trips', JSON.stringify(trips))
+
+      alert(JSON.stringify(points))
+
+    }
 
     renderItem = item => {
         return <View style={styles.item}>
-         <View style={styles.wrapperInfo}>
+         <View style={styles.wrapperInfo} >
             <Text style={styles.itemName}>{item.item.name}</Text>
             <Text>{item.item.description}</Text>
          </View>
@@ -31,21 +69,7 @@ class AddTripScreen extends Component{
     }
 
     render(){
-        const trip = {
-            name: 'Eurotrip 2019',
-            price:'R$ 4.000',
-            places:[
-                { id:'1', name:'Amsterdan', price: 100,description: 'Chegada', lat:0, log:0 },
-                { id:'2', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'3', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'4', name:'Amsterdan', price: 100,description: 'Chegada', lat:0, log:0 },
-                { id:'5', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'6', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'7', name:'Amsterdan', price: 100,description: 'Chegada', lat:0, log:0 },
-                { id:'8', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-                { id:'9', name:'bruxelas', price: 150, description:'Hospedagem', lat:0, log:0 },
-            ]
-        };
+      
         return(
             <View style={styles.wrapper}>
                 <View style={styles.header}>
@@ -80,16 +104,15 @@ class AddTripScreen extends Component{
                         </TouchableOpacity>
                     </View> */}
 
-                    <Text style={styles.tripName}>{trip.name}</Text>
-                    <Text style={styles.tripPrice}>R$ {trip.price}</Text>
                 </View>
                 <TextInput style={styles.input} placeholder="Nome do ponto" onChangeText={txt => this.setState({pointName:txt})}/>
                 <TextInput style={styles.input} placeholder="Descrição" onChangeText={txt => this.setState({description:txt})}/>
-                <TextInput style={styles.input} placeholder="Preço" onChangeText={txt => this.setState({price:txt})}/>
-                <TouchableOpacity style={styles.btnSave}>
+                <TextInput style={styles.input} placeholder="Preço" onChangeText={txt => this.setState({ price:parseFloat(txt) })}/>
+                <TouchableOpacity style={styles.btnSave} onPress={this.handleSave}>
                   <Text style={styles.textButtonSave}>Salvar ponto</Text>
                 </TouchableOpacity>
-                <Text>{JSON.stringify(this.state)}</Text>
+                {/* <Text>{JSON.stringify(this.state)}</Text> */}
+                <Text>{this.props.navigation.state.params.id}</Text>
             </View> 
         );
     }
